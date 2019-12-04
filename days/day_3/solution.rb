@@ -34,11 +34,13 @@ def build_path(instructions, coordinates)
         path << { y: (coordinates[:y] + i), x: coordinates[:x] }
       end
       coordinates[:x] += distance
-    when 'L'
+    when 'D'
       distance.times do |i|
         path << { y: (coordinates[:y] - i), x: coordinates[:x] }
       end
       coordinates[:x] -= distance
+    else
+      raise "Invalid direaction #{direction}"
     end
   end
 
@@ -65,8 +67,24 @@ puts "Finished wire 1! path is: #{path_one}"
 
 path_two = build_path(wire_two, { x: 0, y: 0 }).uniq
 
+puts "*"*1000
+puts "Finished wire 2! path is: #{path_two}"
+
+puts "#{path_two.count} points in path two. #{path_one.count} points in path one."
+
+puts "finding intersections"
 intersections = path_one.select { |point| path_two.include? point }
 
-point = intersections.min_by { |point| distance({ x: 0, y: 0 }, point) }
+puts "*"*100
+puts "#{intersections.count} intersections = #{intersections}"
+
+unique_intersections = intersections.uniq
+
+puts "#{unique_intersections.count} unique_intersections: #{unique_intersections}"
+
+puts "calculating distances from center"
+point = unique_intersections.min_by { |point| distance({ x: 0, y: 0 }, point) }
+
+puts "done calculating distances"
 
 puts "point is #{point}"
