@@ -35,17 +35,22 @@ end
 
 def double?(ary)
   ary_length = ary.count
-  index = 1
-  last_number = ary[0]
-  double = false
   last_index = ary_length - 1
+  indices = 0..last_index
+  double = false
 
-  for index in 1..last_index
-    if ary[index] == last_number
-      double = true
-      break
+  indices.each do |index|
+    if index == 0
+      next
     else
-      last_number = ary[index]
+      previous_previous_index = index - 2
+      previous_index = index - 1
+      next_index = index + 1
+
+      if (ary[index] == ary[previous_index] && ary[next_index] != ary[index] && ary[previous_index] != ary[previous_previous_index])
+        double = true
+        break
+      end
     end
   end
 
@@ -79,3 +84,25 @@ puts "final count is #{finals.count}"
 #   end
 # end
 #
+#
+# double method in part 1
+#
+# def double?(ary)
+#   ary_length = ary.count
+#   index = 1
+#   last_number = ary[0]
+#   double = false
+#   last_index = ary_length - 1
+
+#   for index in 1..last_index
+#     if ary[index] == last_number
+#       double = true
+#       break
+#     else
+#       last_number = ary[index]
+#     end
+#   end
+
+#   double
+# end
+
