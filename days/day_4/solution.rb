@@ -60,16 +60,22 @@ end
 
 nums = 264793..803935
 
-# filtered = nums.reject { |num| (num.to_s.include? '2') || (num.to_s.include? '1') || (num.to_s.include? '0') }
-
-nums.each do |num|
-  if meets_criteria? num
-    puts num
-    puts "count is #{count}"
-    count += 1
-  end
-end
-
 finals = nums.select { |num| meets_criteria? num }
 
 puts "final count is #{finals.count}"
+
+# earlier approaches I was surprised didn't work:
+#
+# filtering out any numbers that included 2, 1, or 0 (909)
+# filtered = nums.reject { |num| (num.to_s.include? '2') || (num.to_s.include? '1') || (num.to_s.include? '0') }
+
+# for some reason the following returned one too few (965 instead of 966)
+# count = 0
+# nums.each do |num|
+#   if meets_criteria? num
+#     puts num
+#     puts "count is #{count}"
+#     count += 1
+#   end
+# end
+#
