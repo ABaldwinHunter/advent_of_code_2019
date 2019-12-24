@@ -7,8 +7,11 @@ wires = file.split("\n").map { |wire_string| wire_string.split(",") }
 wire_one = wires.first
 wire_two = wires.last
 
-def build_path(instructions, coordinates)
-  path = {}
+# key: x1y1
+
+def build_points_visited(instructions)
+  current_coordinates = { x: 0, y: 0 }
+  path = { 'x0y0' => true }
 
   instructions.each do |instruction|
     puts "instruction is #{instruction}"
@@ -20,44 +23,30 @@ def build_path(instructions, coordinates)
     case direction
     when 'R'
       distance.times do |i|
-        new_x = coordinates[:x] + i
-        if path[new_x]
-          path[new_x] << coordinates[:y]
-        else
-          path[new_x] = [coordinates[:y]]
-        end
+        new_x = current_coordinates[:x] + i
+        path["x#{new_x}y#{current_coordinates[:y]}"] = true
       end
-      coordinates[:x] += distance
+      current_coordinates[:x] += distance
     when 'L'
       distance.times do |i|
-        new_x = coordinates[:x] - i
-        if path[new_x]
-          path[new_x] << coordinates[:y]
-        else
-          path[new_x] = [coordinates[:y]]
-        end
+        new_x = current_coordinates[:x] - i
+        path["x#{new_x}y#{current_coordinates[:y]}"] = true
       end
-      coordinates[:x] -= distance
+      current_coordinates[:x] -= distance
     when 'U'
       distance.times do |i|
-        x = coordinates[:x]
-        if path[x]
-          path[x] << coordinates[:y] + 1
-        else
-          path[x] = [coordinates[:y] + 1]
-        end
+        x = current_coordinates[:x]
+        new_y = current_coordinates[:y] + i
+        path["x#{x}y#{new_y}"] = true
       end
-      coordinates[:y] += distance
+      current_coordinates[:y] += distance
     when 'D'
       distance.times do |i|
-        x = coordinates[:x]
-        if path[x]
-          path[x] << coordinates[:y] - 1
-        else
-          path[x] = [coordinates[:y] - 1]
-        end
+        x = current_coordinates[:x]
+        new_y = current_coordinates[:y] - i
+        path["x#{x}y#{new_y}"] = true
       end
-      coordinates[:y] -= distance
+      current_coordinates[:y] -= distance
     else
       raise "Invalid direction #{direction}"
     end
@@ -67,45 +56,47 @@ def build_path(instructions, coordinates)
 end
 
 def manhattan_distance(point_1, point_2)
-  Math.abs(point_1.first - point_2.first) + Math.abs(point_1.last - point_2.last)
+  (point_1.first - point_2.first).abs + (point_1.last - point_2.last).abs
 end
 
 puts "Wire 1 is #{wire_one}"
 
-path_one = build_path(wire_one, { x: 0, y: 0 })
+points_visited_1 = build_points_visited(wire_one)
+puts "*"*1000
+puts "Finished wire 1!"
+
+points_visited_2 = build_points_visited(wire_two)
 
 puts "*"*1000
-puts "Finished wire 1! path is: #{path_one}"
-
-path_two = build_path(wire_two, { x: 0, y: 0 })
-
-puts "*"*1000
-puts "Finished wire 2! path is: #{path_two}"
-
-puts "#{path_two.count} points in path two. #{path_one.count} points in path one."
+puts "Finished wire 2!"
 
 puts "finding intersections"
 
 intersections = []
 
-path_one.each do |x_key, y_values|
-  if (path_two_y_values = path_two[x_key])
-    y_values.uniq.each do |y|
-      if path_two_y_values.include? y
-        intersections << [x_key, y]
-      end
-    end
+points_visited_1.each do |key, value|
+  if points_visited_2[key]
+    intersections << key
   end
 end
 
 puts "found #{intersections.count} intersections"
 
+intersections.reject! { |point| point == 'x0y0' }
+
 puts "*"*100
 puts "intersections are #{intersections}"
 
 puts "calculating distances from center"
-point = intersections.min_by { |point| manhattan_distance([0, 0], point) }
+
+distances = intersections.map do |point|
+  x_comma_y = point.split("x").last.split("y").map(&:to_i)
+
+  manhattan_distance([0, 0], x_comma_y)
+end
+
+min = distances.min
 
 puts "done calculating distances"
 
-puts "point is #{point}"
+puts "min is #{min}!"
